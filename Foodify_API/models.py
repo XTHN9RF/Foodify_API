@@ -4,10 +4,10 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
 class User(AbstractBaseUser, PermissionsMixin):
     """Database model that describes users in the system"""
-    email = models.EmailField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    password = models.CharField(max_length=255)
+    email = models.EmailField(max_length=30, unique=True)
+    name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    password = models.CharField(max_length=150)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
@@ -23,7 +23,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Category(models.Model):
     """Database model that represents categories in the application"""
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=30)
 
     def __str__(self):
         """" Return string representation of category to display it understandably in the admin panel """
@@ -32,9 +32,9 @@ class Category(models.Model):
 
 class Product(models.Model):
     """ Database model that describes products in the system """
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=45)
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     REQUIRED_FIELDS = ['name', 'description', 'price', 'category']
@@ -46,23 +46,23 @@ class Product(models.Model):
 
 class Address(models.Model):
     """Database model that represents addresses of the user"""
-    street_name = models.CharField(max_length=255, Nullable=True)
-    city = models.CharField(max_length=255)
-    building_number = models.DecimalField(max_length=5, decimal_places=2, Nullable=True)
+    street_name = models.CharField(max_length=100, Nullable=True)
+    settlement = models.CharField(max_length=50)
+    building_number = models.CharField(max_length=10, Nullable=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     REQUIRED_FIELDS = ['city', 'user']
 
     def __str__(self):
         """Return string representation of address to display full address in the admin panel """
-        return f"{self.street_name} {self.building_number}, {self.city}"
+        return f"{self.street_name} {self.building_number}, {self.settlement}"
 
 
 class CartItem(models.Model):
     """Database model that represents item in the cart"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.IntegerField(max_length=2)
 
     REQUIRED_FIELDS = ['product', 'quantity', 'user']
 
@@ -74,6 +74,6 @@ class Order(models.Model):
     cart_items = models.ManyToManyField(CartItem)
     date = models.DateTimeField(auto_now_add=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    phone_number = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=15)
 
     REQUIRED_FIELDS = ['user', 'address', 'cart_items', 'date', 'status']
