@@ -45,6 +45,7 @@ class Product(models.Model):
 
 
 class Address(models.Model):
+    """Database model that represents addresses of the user"""
     street_name = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     building_number = models.DecimalField(max_length=5, decimal_places=2)
@@ -53,4 +54,5 @@ class Address(models.Model):
     REQUIRED_FIELDS = ['street', 'city', 'building_number', 'user']
 
     def __str__(self):
+        """Return string representation of address to display full address in the admin panel """
         return f"{self.street_name} {self.building_number}, {self.city}"
