@@ -17,4 +17,5 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['name', 'last_name', 'password']
 
     def __str__(self):
+        """" Return string representation of our user to display it understandably in the admin panel """
         return self.email
