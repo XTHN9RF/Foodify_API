@@ -22,8 +22,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Category(models.Model):
+    """Database model that describes categories in the system"""
     name = models.CharField(max_length=255)
     description = models.TextField()
 
     def __str__(self):
+        """" Return string representation of category to display it understandably in the admin panel """
         return self.name
