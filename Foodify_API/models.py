@@ -17,7 +17,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['name', 'last_name', 'password']
 
     def __str__(self):
-        """" Return string representation of our user to display it understandably in the admin panel """
+        """" Return string representation of user to display it understandably in the admin panel """
         return self.email
 
 
@@ -42,3 +42,15 @@ class Product(models.Model):
     def __str__(self):
         """" Return string representation of product to display it understandably in the admin panel """
         return self.name
+
+
+class Address(models.Model):
+    street_name = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    building_number = models.DecimalField(max_length=5, decimal_places=2)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    REQUIRED_FIELDS = ['street', 'city', 'building_number', 'user']
+
+    def __str__(self):
+        return f"{self.street_name} {self.building_number}, {self.city}"
