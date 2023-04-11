@@ -74,5 +74,6 @@ class Order(models.Model):
     cart_items = models.ManyToManyField(CartItem)
     date = models.DateTimeField(auto_now_add=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    phone_number = models.CharField(max_length=255)
 
     REQUIRED_FIELDS = ['user', 'address', 'cart_items', 'date', 'status']
