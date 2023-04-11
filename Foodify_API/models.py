@@ -68,6 +68,7 @@ class CartItem(models.Model):
 
 
 class Order(models.Model):
+    """Database model for orders representation"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
     cart_items = models.ManyToManyField(CartItem)
