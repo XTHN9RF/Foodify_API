@@ -22,9 +22,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Category(models.Model):
-    """Database model that describes categories in the system"""
+    """Database model that represents categories in the application"""
     name = models.CharField(max_length=255)
-    description = models.TextField()
 
     def __str__(self):
         """" Return string representation of category to display it understandably in the admin panel """
@@ -32,6 +31,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    """ Database model that describes products in the system """
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -40,4 +40,5 @@ class Product(models.Model):
     REQUIRED_FIELDS = ['name', 'description', 'price', 'category']
 
     def __str__(self):
+        """" Return string representation of product to display it understandably in the admin panel """
         return self.name
