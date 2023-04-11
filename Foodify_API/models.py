@@ -56,3 +56,11 @@ class Address(models.Model):
     def __str__(self):
         """Return string representation of address to display full address in the admin panel """
         return f"{self.street_name} {self.building_number}, {self.city}"
+
+
+class CartItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+
+    REQUIRED_FIELDS = ['product', 'quantity', 'user']
