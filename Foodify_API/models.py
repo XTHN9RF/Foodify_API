@@ -59,6 +59,7 @@ class Address(models.Model):
 
 
 class CartItem(models.Model):
+    """Database model that represents item in the cart"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
