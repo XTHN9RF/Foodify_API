@@ -46,12 +46,12 @@ class Product(models.Model):
 
 class Address(models.Model):
     """Database model that represents addresses of the user"""
-    street_name = models.CharField(max_length=255)
+    street_name = models.CharField(max_length=255, Nullable=True)
     city = models.CharField(max_length=255)
-    building_number = models.DecimalField(max_length=5, decimal_places=2)
+    building_number = models.DecimalField(max_length=5, decimal_places=2, Nullable=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    REQUIRED_FIELDS = ['street', 'city', 'building_number', 'user']
+    REQUIRED_FIELDS = ['city', 'user']
 
     def __str__(self):
         """Return string representation of address to display full address in the admin panel """
