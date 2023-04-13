@@ -106,9 +106,9 @@ class Product(models.Model):
 
 class Address(models.Model):
     """Database model that represents addresses of the user"""
-    street_name = models.CharField(max_length=100, Nullable=True)
+    street_name = models.CharField(max_length=100, blank=True)
     settlement = models.CharField(max_length=50)
-    building_number = models.CharField(max_length=10, Nullable=True)
+    building_number = models.CharField(max_length=10, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     REQUIRED_FIELDS = ['city', 'user']
@@ -122,7 +122,7 @@ class CartItem(models.Model):
     """Database model that represents item in the cart"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    quantity = models.IntegerField(max_length=2)
+    quantity = models.IntegerField()
 
     REQUIRED_FIELDS = ['product', 'quantity', 'user']
 
