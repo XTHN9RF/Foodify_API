@@ -1,5 +1,26 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+
+
+class UserManager(BaseUserManager):
+    def create_user(self, email, name, last_name, password=None):
+        if not email or not name or not last_name:
+            raise ValueError('User must have correct credentials')
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, name=name, last_name=last_name)
+        user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+
+    def create_superuser(self, email, name, last_name, password):
+        user = self.create_user(email, name, last_name, password)
+        user.is_superuser = True
+        user.is_admin = True
+        user.save(using=self._db)
+
+        return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):
