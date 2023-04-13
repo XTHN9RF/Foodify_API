@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 
 class UserManager(BaseUserManager):
     """Manager that helps to create user with validated credentials and hashed password"""
+
     def create_user(self, email, name, last_name, password=None):
         """Function that creates user"""
         if not email or not name or not last_name:
@@ -45,9 +46,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
+class CategoryManager(models.Manager):
+    def create_category(self, name):
+        if not name:
+            raise ValueError('Category must have correct name')
+
+        category = self.model(name=name)
+        category.save(using=self._db)
+
+        return category
+
+
 class Category(models.Model):
     """Database model that represents categories in the application"""
     name = models.CharField(max_length=30)
+
+    objects = CategoryManager()
+
+    REQUIRED_FIELDS = ['name']
 
     def __str__(self):
         """" Return string representation of category to display it understandably in the admin panel """
@@ -56,6 +72,7 @@ class Category(models.Model):
 
 class ProductManager(models.Manager):
     """Manager that helps to create product with full credentials"""
+
     def create_product(self, name, description, price, category):
         """Function that creates product"""
         if not name or not description:
