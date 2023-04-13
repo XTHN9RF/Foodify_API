@@ -29,12 +29,12 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """Database model that describes users in the system"""
-    email = models.EmailField(max_length=30, unique=True)
-    name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    password = models.CharField(max_length=150)
+    email = models.EmailField(max_length=30, unique=True, editable=False)
+    name = models.CharField(max_length=30, editable=False)
+    last_name = models.CharField(max_length=30, editable=False)
+    password = models.CharField(max_length=150, editable=False)
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False, editable=False)
 
     objects = UserManager()
 
