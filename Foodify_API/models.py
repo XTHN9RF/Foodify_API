@@ -21,7 +21,7 @@ class UserManager(BaseUserManager):
         """Function that creates admin user"""
         user = self.create_user(email, name, last_name, password)
         user.is_superuser = True
-        user.is_admin = True
+        user.is_staff = True
         user.save(using=self._db)
 
         return user
@@ -34,7 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=30, editable=False)
     password = models.CharField(max_length=150, editable=False)
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False, editable=False)
+    is_staff = models.BooleanField(default=False, editable=False)
 
     objects = UserManager()
 
