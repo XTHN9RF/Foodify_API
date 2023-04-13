@@ -54,12 +54,29 @@ class Category(models.Model):
         return self.name
 
 
+class ProductManager(models.Manager):
+    def create_product(self, name, description, price, category):
+        if not name or not description:
+            raise ValueError('Product must have correct name and description')
+        elif not price:
+            raise ValueError('Product must have a price')
+        elif not category:
+            raise ValueError('Product must have a category')
+
+        product = self.model(name=name, description=description, price=price, category=category)
+        product.save(using=self._db)
+
+        return product
+
+
 class Product(models.Model):
     """ Database model that describes products in the system """
     name = models.CharField(max_length=45)
     description = models.TextField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    objects = ProductManager()
 
     REQUIRED_FIELDS = ['name', 'description', 'price', 'category']
 
