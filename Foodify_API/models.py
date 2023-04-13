@@ -3,7 +3,9 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 
 
 class UserManager(BaseUserManager):
+    """Manager that helps to create user with validated credentials and hashed password"""
     def create_user(self, email, name, last_name, password=None):
+        """Function that creates user"""
         if not email or not name or not last_name:
             raise ValueError('User must have correct credentials')
 
@@ -15,6 +17,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, name, last_name, password):
+        """Function that creates admin user"""
         user = self.create_user(email, name, last_name, password)
         user.is_superuser = True
         user.is_admin = True
