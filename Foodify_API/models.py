@@ -55,7 +55,9 @@ class Category(models.Model):
 
 
 class ProductManager(models.Manager):
+    """Manager that helps to create product with full credentials"""
     def create_product(self, name, description, price, category):
+        """Function that creates product"""
         if not name or not description:
             raise ValueError('Product must have correct name and description')
         elif not price:
