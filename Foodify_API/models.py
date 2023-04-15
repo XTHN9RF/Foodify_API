@@ -111,7 +111,7 @@ class Address(models.Model):
     building_number = models.CharField(max_length=10, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    REQUIRED_FIELDS = ['city', 'user']
+    REQUIRED_FIELDS = ['settlement', 'user']
 
     def __str__(self):
         """Return string representation of address to display full address in the admin panel """
