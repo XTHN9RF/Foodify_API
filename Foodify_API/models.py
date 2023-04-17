@@ -104,12 +104,25 @@ class Product(models.Model):
         return self.name
 
 
+class AddressManager(models.Manager):
+    def create_address(self, user, settlement, street_name=None, building_number=None, ):
+        if not settlement or not user:
+            raise ValueError('Address must have correct settlement and user')
+
+        address = self.model(street_name=street_name, settlement=settlement, building_number=building_number, user=user)
+        address.save(using=self._db)
+
+        return address
+
+
 class Address(models.Model):
     """Database model that represents addresses of the user"""
     street_name = models.CharField(max_length=100, blank=True)
     settlement = models.CharField(max_length=50)
     building_number = models.CharField(max_length=10, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    objects = AddressManager()
 
     REQUIRED_FIELDS = ['settlement', 'user']
 
