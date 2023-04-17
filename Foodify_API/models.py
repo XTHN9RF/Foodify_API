@@ -105,7 +105,9 @@ class Product(models.Model):
 
 
 class AddressManager(models.Manager):
+    """Manager that helps to create address with full or partial credentials"""
     def create_address(self, user, settlement, street_name=None, building_number=None, ):
+        """Function that creates address for user"""
         if not settlement or not user:
             raise ValueError('Address must have correct settlement and user')
 
