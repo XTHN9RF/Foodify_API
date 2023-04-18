@@ -4,7 +4,9 @@ from . import models
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Serializer for the users object"""
     class Meta:
+        """Class that regulates behavior of the serializer"""
         model = models.User
         fields = ('id', 'email', 'name', 'last_name', 'password', 'city')
         extra_kwargs = {
@@ -15,6 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        """Create a new user with encrypted password and return it"""
         user = models.User.objects.create_user(
             email=validated_data['email'],
             name=validated_data['name'],
@@ -30,6 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
+        """Handle updating user password"""
         if 'password' in validated_data:
             password = validated_data.pop('password')
             instance.set_password(password)
