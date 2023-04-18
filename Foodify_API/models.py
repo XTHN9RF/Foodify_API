@@ -5,13 +5,13 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 class UserManager(BaseUserManager):
     """Manager that helps to create user with validated credentials and hashed password"""
 
-    def create_user(self, email, name, last_name, password=None):
+    def create_user(self, email, name, last_name, settlement, password=None):
         """Function that creates user"""
         if not email or not name or not last_name:
             raise ValueError('User must have correct credentials')
 
         email = self.normalize_email(email)
-        user = self.model(email=email, name=name, last_name=last_name)
+        user = self.model(email=email, name=name, last_name=last_name, settlement=settlement)
         user.set_password(password)
         user.save(using=self._db)
 
