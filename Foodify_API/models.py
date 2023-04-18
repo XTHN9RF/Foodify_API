@@ -32,6 +32,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=30, unique=True, )
     name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
+    settlement = models.CharField(max_length=50)
     password = models.CharField(max_length=150, editable=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False, editable=False)
@@ -106,12 +107,12 @@ class Product(models.Model):
 
 class AddressManager(models.Manager):
     """Manager that helps to create address with full or partial credentials"""
-    def create_address(self, user, settlement, street_name=None, building_number=None, ):
+    def create_address(self, user, street_name=None, building_number=None, ):
         """Function that creates address for user"""
-        if not settlement or not user:
-            raise ValueError('Address must have correct settlement and user')
+        if not user:
+            raise ValueError('Address must have correct user')
 
-        address = self.model(street_name=street_name, settlement=settlement, building_number=building_number, user=user)
+        address = self.model(street_name=street_name, building_number=building_number, user=user)
         address.save(using=self._db)
 
         return address
@@ -120,17 +121,16 @@ class AddressManager(models.Manager):
 class Address(models.Model):
     """Database model that represents addresses of the user"""
     street_name = models.CharField(max_length=100, blank=True)
-    settlement = models.CharField(max_length=50)
     building_number = models.CharField(max_length=10, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     objects = AddressManager()
 
-    REQUIRED_FIELDS = ['settlement', 'user']
+    REQUIRED_FIELDS = ['user']
 
     def __str__(self):
         """Return string representation of address to display full address in the admin panel """
-        return f"{self.street_name} {self.building_number}, {self.settlement}"
+        return f"{self.street_name} {self.building_number}"
 
 
 class CartItem(models.Model):
