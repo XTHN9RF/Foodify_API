@@ -32,7 +32,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=30, unique=True, )
     name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    settlement = models.CharField(max_length=50)
+    settlement = models.CharField(max_length=50, blank=True)
     password = models.CharField(max_length=150, editable=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False, editable=False)
@@ -107,6 +107,7 @@ class Product(models.Model):
 
 class AddressManager(models.Manager):
     """Manager that helps to create address with full or partial credentials"""
+
     def create_address(self, user, street_name=None, building_number=None, ):
         """Function that creates address for user"""
         if not user:
