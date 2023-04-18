@@ -8,5 +8,6 @@ router = DefaultRouter()
 router.register('users', views.UserViewSet)
 
 urlpatterns = [
+    path('login/', views.LoginApiView.as_view()),
     path('', include(router.urls)),
 ]
