@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         """Class that regulates behavior of the serializer"""
         model = models.User
-        fields = ('id', 'email', 'name', 'last_name', 'password')
+        fields = ('id', 'email', 'name', 'last_name','settlement', 'password')
         extra_kwargs = {'password': {
             'write_only': True,
             'read_only': False,
@@ -23,6 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             name=validated_data['name'],
             last_name=validated_data['last_name'],
+            settlement=validated_data['settlement'],
             password=validated_data['password']
         )
 
