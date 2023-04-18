@@ -5,13 +5,13 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 class UserManager(BaseUserManager):
     """Manager that helps to create user with validated credentials and hashed password"""
 
-    def create_user(self, email, name, last_name, password=None):
+    def create_user(self, email, name, last_name, settlement, password=None):
         """Function that creates user"""
         if not email or not name or not last_name:
             raise ValueError('User must have correct credentials')
 
         email = self.normalize_email(email)
-        user = self.model(email=email, name=name, last_name=last_name)
+        user = self.model(email=email, name=name, last_name=last_name, settlement=settlement)
         user.set_password(password)
         user.save(using=self._db)
 
@@ -29,9 +29,10 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """Database model that describes users in the system"""
-    email = models.EmailField(max_length=30, unique=True, editable=False)
-    name = models.CharField(max_length=30, editable=False)
-    last_name = models.CharField(max_length=30, editable=False)
+    email = models.EmailField(max_length=30, unique=True, )
+    name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    settlement = models.CharField(max_length=50, blank=True)
     password = models.CharField(max_length=150, editable=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False, editable=False)
@@ -106,12 +107,13 @@ class Product(models.Model):
 
 class AddressManager(models.Manager):
     """Manager that helps to create address with full or partial credentials"""
-    def create_address(self, user, settlement, street_name=None, building_number=None, ):
-        """Function that creates address for user"""
-        if not settlement or not user:
-            raise ValueError('Address must have correct settlement and user')
 
-        address = self.model(street_name=street_name, settlement=settlement, building_number=building_number, user=user)
+    def create_address(self, user, street_name=None, building_number=None, ):
+        """Function that creates address for user"""
+        if not user:
+            raise ValueError('Address must have correct user')
+
+        address = self.model(street_name=street_name, building_number=building_number, user=user)
         address.save(using=self._db)
 
         return address
@@ -120,17 +122,16 @@ class AddressManager(models.Manager):
 class Address(models.Model):
     """Database model that represents addresses of the user"""
     street_name = models.CharField(max_length=100, blank=True)
-    settlement = models.CharField(max_length=50)
     building_number = models.CharField(max_length=10, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     objects = AddressManager()
 
-    REQUIRED_FIELDS = ['settlement', 'user']
+    REQUIRED_FIELDS = ['user']
 
     def __str__(self):
         """Return string representation of address to display full address in the admin panel """
-        return f"{self.street_name} {self.building_number}, {self.settlement}"
+        return f"{self.street_name} {self.building_number}"
 
 
 class CartItem(models.Model):
