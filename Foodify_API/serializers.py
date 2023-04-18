@@ -5,14 +5,15 @@ from . import models
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the users object"""
+
     class Meta:
         """Class that regulates behavior of the serializer"""
         model = models.User
-        fields = ('id', 'email', 'name', 'last_name', 'password', 'city')
-        extra_kwargs = {
-            'password': {
-                'write_only': True,
-                'style': {'input_type': 'password'}
+        fields = ('id', 'email', 'name', 'last_name', 'password')
+        extra_kwargs = {'password': {
+            'write_only': True,
+            'read_only': False,
+            'style': {'input_type': 'password'}
             }
         }
 
@@ -23,11 +24,6 @@ class UserSerializer(serializers.ModelSerializer):
             name=validated_data['name'],
             last_name=validated_data['last_name'],
             password=validated_data['password']
-        )
-
-        models.Address.objects.create(
-            user=user,
-            city=validated_data['city'],
         )
 
         return user
