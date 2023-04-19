@@ -22,6 +22,7 @@ class LoginApiView(ObtainAuthToken):
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    """Handle getting and searching categories"""
     serializer_class = serializers.CategorySerializer
     queryset = models.Category.objects.all()
     permission_classes = (permissions.IsReadOnly,)
