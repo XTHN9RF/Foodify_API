@@ -36,3 +36,12 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
 
         return super().update(instance, validated_data)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Category
+        fields = ('id', 'name', 'description')
+        extra_kwargs = {
+            'description': {'required': False}
+                        }
