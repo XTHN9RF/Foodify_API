@@ -43,7 +43,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         """Class that regulates behavior of the category serializer"""
         model = models.Category
-        fields = ('id', 'name', 'description')
+        fields = ('id', 'name')
         extra_kwargs = {
-            'description': {'required': False}
+            'name': {'required': True}
                         }
