@@ -39,7 +39,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Serializer for the categories object"""
     class Meta:
+        """Class that regulates behavior of the category serializer"""
         model = models.Category
         fields = ('id', 'name', 'description')
         extra_kwargs = {
