@@ -21,3 +21,7 @@ class LoginApiView(ObtainAuthToken):
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
+class CategoryViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.CategorySerializer
+    queryset = models.Category.objects.all()
+    permission_classes = (permissions.IsReadOnly,)
