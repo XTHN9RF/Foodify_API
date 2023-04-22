@@ -1,4 +1,3 @@
-from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import viewsets, filters
 from rest_framework.authentication import TokenAuthentication
@@ -36,4 +35,10 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    lookup_field = 'category__name'
+
+    def get_queryset(self):
+        queryset = self.queryset.all()
+        category_name = self.kwargs.get('pk')
+        if category_name:
+            queryset = queryset.filter(category__name=category_name)
+        return queryset
