@@ -50,7 +50,9 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    """Serializer for the products object"""
     class Meta:
+        """Class that regulates behavior of the product serializer"""
         model = models.Product
         fields = ('id', 'name', 'category', 'price', 'quantity')
         extra_kwargs = {
