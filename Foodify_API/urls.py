@@ -6,6 +6,7 @@ from Foodify_API import views
 
 router = DefaultRouter()
 router.register('users', views.UserViewSet)
+router.register('categories', views.CategoryViewSet)
 
 urlpatterns = [
     path('login/', views.LoginApiView.as_view()),
