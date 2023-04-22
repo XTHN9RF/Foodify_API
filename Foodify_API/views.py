@@ -28,3 +28,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+
+
+class ProductViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.ProductSerializer
+    queryset = models.Product.objects.all()
+    permission_classes = (permissions.IsReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'category__name'
