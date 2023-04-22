@@ -47,3 +47,12 @@ class CategorySerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'name': {'required': True}
                         }
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Product
+        fields = ('id', 'name', 'category', 'price', 'quantity')
+        extra_kwargs = {
+            'category': {'read-only': True, 'write_only': False},
+        }
