@@ -29,7 +29,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
 
 
-class ProductViewSet(viewsets.ModelViewSet):
+class ProductsViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ProductSerializer
     queryset = models.Product.objects.all()
     permission_classes = (permissions.IsReadOnly,)
