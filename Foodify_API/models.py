@@ -60,7 +60,7 @@ class CategoryManager(models.Manager):
 
 class Category(models.Model):
     """Database model that represents categories in the application"""
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True)
 
     objects = CategoryManager()
 
@@ -91,7 +91,7 @@ class ProductManager(models.Manager):
 
 class Product(models.Model):
     """ Database model that describes products in the system """
-    name = models.CharField(max_length=45)
+    name = models.CharField(max_length=45, unique=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)

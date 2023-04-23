@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         """Class that regulates behavior of the serializer"""
         model = models.User
-        fields = ('id', 'email', 'name', 'last_name', 'settlement', 'password')
+        fields = ('email', 'name', 'last_name', 'settlement', 'password')
         extra_kwargs = {'password': {
             'write_only': True,
             'read_only': False,
@@ -44,7 +44,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         """Class that regulates behavior of the category serializer"""
         model = models.Category
-        fields = ('id', 'name')
+        fields = ('name',)
         extra_kwargs = {
             'name': {'required': True}
         }
@@ -56,4 +56,4 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         """Class that regulates behavior of the product serializer"""
         model = models.Product
-        fields = ('id', 'name', 'category', 'price', 'description')
+        fields = ('name', 'price', 'description')
