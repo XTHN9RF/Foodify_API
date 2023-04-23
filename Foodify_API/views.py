@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
@@ -41,4 +41,14 @@ class ProductsViewSet(viewsets.ModelViewSet):
         category_name = self.kwargs.get('pk')
         if category_name:
             queryset = queryset.filter(category__name=category_name)
+        return queryset
+
+
+class SingleProductViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.ProductSerializer
+    queryset = models.Product.objects.all()
+    permission_classes = (permissions.IsReadOnly,)
+
+    def get_queryset(self):
+        queryset = self.queryset.filter(name=self.kwargs.get('pk'))
         return queryset
