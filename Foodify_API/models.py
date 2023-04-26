@@ -61,6 +61,7 @@ class CategoryManager(models.Manager):
 class Category(models.Model):
     """Database model that represents categories in the application"""
     name = models.CharField(max_length=30, unique=True)
+    imageUrl = models.CharField(blank=True)
 
     objects = CategoryManager()
 
@@ -95,6 +96,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    imageUrl = models.CharField(blank=True)
 
     objects = ProductManager()
 
@@ -103,35 +105,6 @@ class Product(models.Model):
     def __str__(self):
         """" Return string representation of product to display it understandably in the admin panel """
         return self.name
-
-
-class AddressManager(models.Manager):
-    """Manager that helps to create address with full or partial credentials"""
-
-    def create_address(self, user, street_name=None, building_number=None, ):
-        """Function that creates address for user"""
-        if not user:
-            raise ValueError('Address must have correct user')
-
-        address = self.model(street_name=street_name, building_number=building_number, user=user)
-        address.save(using=self._db)
-
-        return address
-
-
-class Address(models.Model):
-    """Database model that represents addresses of the user"""
-    street_name = models.CharField(max_length=100, blank=True)
-    building_number = models.CharField(max_length=10, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    objects = AddressManager()
-
-    REQUIRED_FIELDS = ['user']
-
-    def __str__(self):
-        """Return string representation of address to display full address in the admin panel """
-        return f"{self.street_name} {self.building_number}"
 
 
 class CartItem(models.Model):
@@ -146,10 +119,13 @@ class CartItem(models.Model):
 class Order(models.Model):
     """Database model for orders representation"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    address = models.ForeignKey(Address, on_delete=models.CASCADE)
     cart_items = models.ManyToManyField(CartItem)
     date = models.DateTimeField(auto_now_add=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    phone_number = models.CharField(max_length=15)
+    receiver_street = models.CharField(max_length=50)
+    receiver_house_number = models.CharField(max_length=10)
+    receiver_phone_number = models.CharField(max_length=15)
+    status = models.CharField(max_length=20)
 
-    REQUIRED_FIELDS = ['user', 'address', 'cart_items', 'date', 'status']
+    REQUIRED_FIELDS = ['user', 'address', 'cart_items', 'date', 'status', 'total_price', 'phone_number',
+                       'receiver_street', 'receiver_house_number']
