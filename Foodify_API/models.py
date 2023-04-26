@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.utils.text import slugify
 
 
 class UserManager(BaseUserManager):
@@ -48,11 +49,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class CategoryManager(models.Manager):
-    def create_category(self, name):
+    def create_category(self, name, image_url, slug=None):
         if not name:
             raise ValueError('Category must have correct name')
+        if slug is None:
+            slug = slugify(name)
 
-        category = self.model(name=name)
+        category = self.model(name=name, image_url=image_url, slug=slug)
         category.save(using=self._db)
 
         return category
@@ -60,11 +63,18 @@ class CategoryManager(models.Manager):
 
 class Category(models.Model):
     """Database model that represents categories in the application"""
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True)
+    slug = models.SlugField(blank=True, null=True, unique=True)
+    image_url = models.CharField(max_length=250, blank=True)
 
     objects = CategoryManager()
 
     REQUIRED_FIELDS = ['name']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Category, self).save(*args, **kwargs)
 
     def __str__(self):
         """" Return string representation of category to display it understandably in the admin panel """
@@ -74,7 +84,7 @@ class Category(models.Model):
 class ProductManager(models.Manager):
     """Manager that helps to create product with full credentials"""
 
-    def create_product(self, name, description, price, category):
+    def create_product(self, name, description, price, category, image_url, slug=None):
         """Function that creates product"""
         if not name or not description:
             raise ValueError('Product must have correct name and description')
@@ -83,7 +93,8 @@ class ProductManager(models.Manager):
         elif not category:
             raise ValueError('Product must have a category')
 
-        product = self.model(name=name, description=description, price=price, category=category)
+        product = self.model(name=name, description=description, price=price, category=category, image_url=image_url,
+                             slug=slug)
         product.save(using=self._db)
 
         return product
@@ -91,47 +102,25 @@ class ProductManager(models.Manager):
 
 class Product(models.Model):
     """ Database model that describes products in the system """
-    name = models.CharField(max_length=45)
+    name = models.CharField(max_length=45, unique=True)
+    slug = models.SlugField(blank=True, null=True, unique=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    image_url = models.CharField(max_length=250, blank=True)
 
     objects = ProductManager()
 
     REQUIRED_FIELDS = ['name', 'description', 'price', 'category']
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Product, self).save(*args, **kwargs)
+
     def __str__(self):
         """" Return string representation of product to display it understandably in the admin panel """
         return self.name
-
-
-class AddressManager(models.Manager):
-    """Manager that helps to create address with full or partial credentials"""
-
-    def create_address(self, user, street_name=None, building_number=None, ):
-        """Function that creates address for user"""
-        if not user:
-            raise ValueError('Address must have correct user')
-
-        address = self.model(street_name=street_name, building_number=building_number, user=user)
-        address.save(using=self._db)
-
-        return address
-
-
-class Address(models.Model):
-    """Database model that represents addresses of the user"""
-    street_name = models.CharField(max_length=100, blank=True)
-    building_number = models.CharField(max_length=10, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    objects = AddressManager()
-
-    REQUIRED_FIELDS = ['user']
-
-    def __str__(self):
-        """Return string representation of address to display full address in the admin panel """
-        return f"{self.street_name} {self.building_number}"
 
 
 class CartItem(models.Model):
@@ -146,10 +135,13 @@ class CartItem(models.Model):
 class Order(models.Model):
     """Database model for orders representation"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    address = models.ForeignKey(Address, on_delete=models.CASCADE)
     cart_items = models.ManyToManyField(CartItem)
     date = models.DateTimeField(auto_now_add=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    phone_number = models.CharField(max_length=15)
+    receiver_street = models.CharField(max_length=50, blank=True, null=True)
+    receiver_house_number = models.CharField(max_length=10, blank=True, null=True)
+    receiver_phone_number = models.CharField(max_length=15)
+    status = models.CharField(max_length=20)
 
-    REQUIRED_FIELDS = ['user', 'address', 'cart_items', 'date', 'status']
+    REQUIRED_FIELDS = ['user', 'address', 'cart_items', 'date', 'status', 'total_price', 'phone_number',
+                       'receiver_street', 'receiver_house_number']

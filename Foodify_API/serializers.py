@@ -9,12 +9,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         """Class that regulates behavior of the serializer"""
         model = models.User
-        fields = ('id', 'email', 'name', 'last_name','settlement', 'password')
+        fields = ('email', 'name', 'last_name', 'settlement', 'password')
         extra_kwargs = {'password': {
             'write_only': True,
             'read_only': False,
             'style': {'input_type': 'password'}
-            }
+        }
         }
 
     def create(self, validated_data):
@@ -40,10 +40,20 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     """Serializer for the categories object"""
+
     class Meta:
         """Class that regulates behavior of the category serializer"""
         model = models.Category
-        fields = ('id', 'name')
+        fields = ('name', 'image_url')
         extra_kwargs = {
             'name': {'required': True}
-                        }
+        }
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    """Serializer for the products object"""
+
+    class Meta:
+        """Class that regulates behavior of the product serializer"""
+        model = models.Product
+        fields = ('name', 'price', 'description', 'image_url')
