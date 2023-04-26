@@ -25,12 +25,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """Handle getting and searching categories"""
     serializer_class = serializers.CategorySerializer
     queryset = models.Category.objects.all()
-    permission_classes = (permissions.IsReadOnly, IsAuthenticated)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    """Return objects for the current authenticated user only"""
+    permission_classes = (permissions.IsReadOnly, IsAuthenticated)
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
+        """Return one category by name or all categories"""
         queryset = self.queryset.all()
         category_name = self.kwargs.get('pk')
         if category_name:
@@ -39,14 +41,17 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 class ProductsViewSet(viewsets.ModelViewSet):
+    """Handle getting and searching products"""
     serializer_class = serializers.ProductSerializer
     queryset = models.Product.objects.all()
-    permission_classes = (IsAuthenticated, permissions.IsReadOnly)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    """Return objects for the current authenticated user only"""
+    permission_classes = (IsAuthenticated, permissions.IsReadOnly)
     authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
+        """Return one product by name or all products"""
         queryset = self.queryset.all()
         product_name = self.kwargs.get('pk')
         if product_name:
