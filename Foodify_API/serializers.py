@@ -44,7 +44,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         """Class that regulates behavior of the category serializer"""
         model = models.Category
-        fields = ('name',)
+        fields = ('name', 'image_url')
         extra_kwargs = {
             'name': {'required': True}
         }
@@ -56,4 +56,4 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         """Class that regulates behavior of the product serializer"""
         model = models.Product
-        fields = ('name', 'price', 'description')
+        fields = ('name', 'price', 'description', 'image_url')
