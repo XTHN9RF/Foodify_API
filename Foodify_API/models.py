@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.utils.text import slugify
 
 
 class UserManager(BaseUserManager):
@@ -48,11 +49,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class CategoryManager(models.Manager):
-    def create_category(self, name):
+    def create_category(self, name, image_url, slug=None):
         if not name:
             raise ValueError('Category must have correct name')
+        if slug is None:
+            slug = slugify(name)
 
-        category = self.model(name=name)
+        category = self.model(name=name, image_url=image_url, slug=slug)
         category.save(using=self._db)
 
         return category
@@ -61,11 +64,17 @@ class CategoryManager(models.Manager):
 class Category(models.Model):
     """Database model that represents categories in the application"""
     name = models.CharField(max_length=30, unique=True)
-    imageUrl = models.CharField(blank=True)
+    slug = models.SlugField(blank=True, null=True, unique=True)
+    image_url = models.CharField(max_length=250, blank=True)
 
     objects = CategoryManager()
 
     REQUIRED_FIELDS = ['name']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Category, self).save(*args, **kwargs)
 
     def __str__(self):
         """" Return string representation of category to display it understandably in the admin panel """
@@ -75,7 +84,7 @@ class Category(models.Model):
 class ProductManager(models.Manager):
     """Manager that helps to create product with full credentials"""
 
-    def create_product(self, name, description, price, category):
+    def create_product(self, name, description, price, category, image_url, slug=None):
         """Function that creates product"""
         if not name or not description:
             raise ValueError('Product must have correct name and description')
@@ -84,7 +93,8 @@ class ProductManager(models.Manager):
         elif not category:
             raise ValueError('Product must have a category')
 
-        product = self.model(name=name, description=description, price=price, category=category)
+        product = self.model(name=name, description=description, price=price, category=category, image_url=image_url,
+                             slug=slug)
         product.save(using=self._db)
 
         return product
@@ -93,14 +103,20 @@ class ProductManager(models.Manager):
 class Product(models.Model):
     """ Database model that describes products in the system """
     name = models.CharField(max_length=45, unique=True)
+    slug = models.SlugField(blank=True, null=True, unique=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    imageUrl = models.CharField(blank=True)
+    image_url = models.CharField(max_length=250, blank=True)
 
     objects = ProductManager()
 
     REQUIRED_FIELDS = ['name', 'description', 'price', 'category']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Product, self).save(*args, **kwargs)
 
     def __str__(self):
         """" Return string representation of product to display it understandably in the admin panel """
@@ -122,8 +138,8 @@ class Order(models.Model):
     cart_items = models.ManyToManyField(CartItem)
     date = models.DateTimeField(auto_now_add=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    receiver_street = models.CharField(max_length=50)
-    receiver_house_number = models.CharField(max_length=10)
+    receiver_street = models.CharField(max_length=50, blank=True, null=True)
+    receiver_house_number = models.CharField(max_length=10, blank=True, null=True)
     receiver_phone_number = models.CharField(max_length=15)
     status = models.CharField(max_length=20)
 
