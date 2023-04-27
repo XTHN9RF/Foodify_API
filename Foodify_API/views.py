@@ -1,24 +1,25 @@
 from rest_framework.response import Response
 from rest_framework import viewsets, filters, status
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.settings import api_settings
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from Foodify_API import models, serializers, permissions
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    """Handle creating and updating users"""
+class RegistrationApiView(APIView):
+    """Handle creating user accounts"""
     serializer_class = serializers.UserSerializer
-    queryset = models.User.objects.all()
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (permissions.IsOwnerOrReadOnly,)
 
-
-class LoginApiView(ObtainAuthToken):
-    """Handle creating user authentication tokens"""
-    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+    def post(self, request):
+        """Create a new user"""
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {'message': 'User created successfully'},
+                status=status.HTTP_201_CREATED
+            )
+        return Response({"errorMessage": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -29,7 +30,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
     """Return objects for the current authenticated user only"""
     permission_classes = (permissions.IsReadOnly, IsAuthenticated)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         """Return one category by name or all categories"""
@@ -48,7 +48,6 @@ class ProductsViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
     """Return objects for the current authenticated user only"""
     permission_classes = (IsAuthenticated, permissions.IsReadOnly)
-    authentication_classes = (TokenAuthentication,)
 
     def get_queryset(self):
         """Return one product by name or all products"""
