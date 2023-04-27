@@ -1,13 +1,11 @@
 from rest_framework.response import Response
-from rest_framework import viewsets
-from rest_framework import filters
+from rest_framework.filters import SearchFilter
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.authentication import get_authorization_header
 
 from Foodify_API import models
 from Foodify_API import serializers
-from Foodify_API import permissions
 from Foodify_API import authentication
 
 
@@ -82,7 +80,11 @@ class RefreshApiView(APIView):
 
 class CategoryApiView(APIView):
     """Handle getting and searching categories"""
-    def get(self, request, pk=None):
+    serializer_class = serializers.CategorySerializer
+    filter_backends = (SearchFilter,)
+    search_fields = ('name',)
+
+    def get(self, request):
         """Return a list of all categories or one category by name"""
         header = get_authorization_header(request).split()
 
@@ -90,7 +92,9 @@ class CategoryApiView(APIView):
             token = header[1].decode('utf-8')
         else:
             return Response({'errorMessage': 'No token provided'}, status=status.HTTP_401_UNAUTHORIZED)
+
         is_token_valid = authentication.is_token_valid(token)
+
         if is_token_valid:
             queryset = self.get_queryset()
             serializer = serializers.CategorySerializer(queryset, many=True)
@@ -100,7 +104,7 @@ class CategoryApiView(APIView):
     def get_queryset(self):
         """Return a list of all categories or one category by name"""
         queryset = models.Category.objects.all()
-        category_name = self.kwargs.get('pk')
+        category_name = self.request.query_params.get('search', None)
         if category_name:
-            queryset = queryset.filter(slug=category_name)
+            queryset = queryset.filter(slug__contains=category_name.lower())
         return queryset
