@@ -53,6 +53,32 @@ class LoginApiView(APIView):
         return response
 
 
+class RefreshApiView(APIView):
+    """Handle refreshing access token"""
+    def get(self, request):
+        """Refresh access token by checking validity of refresh token and user data, then returns a new access token"""
+        refresh_token = request.COOKIES.get('refresh_token')
+        if not refresh_token:
+            return Response({'errorMessage': 'No refresh token'}, status=status.HTTP_403_FORBIDDEN)
+
+        user_id = authentication.decode_refresh_token(refresh_token)
+        if not user_id:
+            return Response({'errorMessage': 'Invalid refresh token'}, status=status.HTTP_403_FORBIDDEN)
+
+        user = models.User.objects.get(id=user_id)
+        if not user:
+            return Response({'errorMessage': 'User not found'}, status=status.HTTP_403_FORBIDDEN)
+
+        access_token = authentication.create_access_token(user.id)
+        response = Response()
+        response.data = {
+            'token': access_token,
+            'message': 'Access token refreshed successfully'
+        }
+        response.status_code = status.HTTP_200_OK
+        return response
+
+
 class CategoryViewSet(viewsets.ModelViewSet):
     """Handle getting and searching categories"""
     serializer_class = serializers.CategorySerializer
