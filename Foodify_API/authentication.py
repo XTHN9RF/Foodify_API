@@ -27,13 +27,13 @@ def decode_access_token(token):
     try:
         payload = jwt.decode(token, 'access_secret', algorithms=['HS256'])
         return payload['user_id']
-    except:
-        return Response({'errorMessage': 'Unauthenticated'}, status=401)
+    except jwt.ExpiredSignatureError:
+        return Response({'errorMessage': 'Unauthenticated, token has expired'}, status=401)
 
 
 def decode_refresh_token(token):
     try:
         payload = jwt.decode(token, 'refresh_secret', algorithms=['HS256'])
         return payload['user_id']
-    except:
-        return Response({'errorMessage': 'Login again'}, status=401)
+    except jwt.ExpiredSignatureError:
+        return Response({'errorMessage': 'Refresh token has expired, login again'}, status=401)
