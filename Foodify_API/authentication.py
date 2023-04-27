@@ -1,6 +1,7 @@
 import datetime
 import jwt
 from rest_framework.response import Response
+from Foodify_API import models
 
 
 def create_access_token(id):
@@ -37,3 +38,14 @@ def decode_refresh_token(token):
         return payload['user_id']
     except jwt.ExpiredSignatureError:
         return Response({'errorMessage': 'Refresh token has expired, login again'}, status=401)
+
+
+def is_token_valid(token):
+    try:
+        payload = jwt.decode(token, 'access_secret', algorithms=['HS256'])
+        user = models.User.objects.get(id=payload['user_id'])
+        if not user:
+            return False
+        return True
+    except jwt.ExpiredSignatureError:
+        return False
