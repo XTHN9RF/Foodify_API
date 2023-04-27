@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework import filters
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import get_authorization_header
 
 from Foodify_API import models
 from Foodify_API import serializers
@@ -55,6 +55,7 @@ class LoginApiView(APIView):
 
 class RefreshApiView(APIView):
     """Handle refreshing access token"""
+
     def get(self, request):
         """Refresh access token by checking validity of refresh token and user data, then returns a new access token"""
         refresh_token = request.COOKIES.get('refresh_token')
@@ -79,37 +80,27 @@ class RefreshApiView(APIView):
         return response
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryApiView(APIView):
     """Handle getting and searching categories"""
-    serializer_class = serializers.CategorySerializer
-    queryset = models.Category.objects.all()
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    """Return objects for the current authenticated user only"""
-    permission_classes = (permissions.IsReadOnly, IsAuthenticated)
+    def get(self, request, pk=None):
+        """Return a list of all categories or one category by name"""
+        header = get_authorization_header(request).split()
+
+        if header and len(header) == 2:
+            token = header[1].decode('utf-8')
+        else:
+            return Response({'errorMessage': 'No token provided'}, status=status.HTTP_401_UNAUTHORIZED)
+        is_token_valid = authentication.is_token_valid(token)
+        if is_token_valid:
+            queryset = self.get_queryset()
+            serializer = serializers.CategorySerializer(queryset, many=True)
+            return Response(serializer.data)
+        return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
     def get_queryset(self):
-        """Return one category by name or all categories"""
-        queryset = self.queryset.all()
+        """Return a list of all categories or one category by name"""
+        queryset = models.Category.objects.all()
         category_name = self.kwargs.get('pk')
         if category_name:
             queryset = queryset.filter(slug=category_name)
-        return queryset
-
-
-class ProductsViewSet(viewsets.ModelViewSet):
-    """Handle getting and searching products"""
-    serializer_class = serializers.ProductSerializer
-    queryset = models.Product.objects.all()
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    """Return objects for the current authenticated user only"""
-    permission_classes = (IsAuthenticated, permissions.IsReadOnly)
-
-    def get_queryset(self):
-        """Return one product by name or all products"""
-        queryset = self.queryset.all()
-        product_name = self.kwargs.get('pk')
-        if product_name:
-            queryset = queryset.filter(slug=product_name)
         return queryset
