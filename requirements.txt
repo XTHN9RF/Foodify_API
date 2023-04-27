@@ -1,2 +1,5 @@
 Django~=4.2
 djangorestframework~=3.12
+corsheaders~=3.14
+pyJWT~=2.1
+```
