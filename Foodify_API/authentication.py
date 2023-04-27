@@ -29,3 +29,11 @@ def decode_access_token(token):
         return payload['user_id']
     except:
         return Response({'errorMessage': 'Unauthenticated'}, status=401)
+
+
+def decode_refresh_token(token):
+    try:
+        payload = jwt.decode(token, 'refresh_secret', algorithms=['HS256'])
+        return payload['user_id']
+    except:
+        return Response({'errorMessage': 'Login again'}, status=401)
