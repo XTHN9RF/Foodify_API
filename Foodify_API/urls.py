@@ -10,5 +10,4 @@ urlpatterns = [
     path('login', views.LoginApiView.as_view(), name='login'),
     path('refresh', views.RefreshApiView.as_view(), name='refresh'),
     path('categories/', views.CategoryApiView.as_view(), name='categories'),
-    path('categories/<slug:pk>', views.CategoryApiView.as_view(), name='single_category'),
 ]
