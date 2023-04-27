@@ -1,9 +1,14 @@
 from rest_framework.response import Response
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets
+from rest_framework import filters
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
-from Foodify_API import models, serializers, permissions
+from Foodify_API import models
+from Foodify_API import serializers
+from Foodify_API import permissions
+from Foodify_API import authentication
 
 
 class RegistrationApiView(APIView):
@@ -20,6 +25,32 @@ class RegistrationApiView(APIView):
                 status=status.HTTP_201_CREATED
             )
         return Response({"errorMessage": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginApiView(APIView):
+    """Handle logging in user accounts"""
+
+    def post(self, request):
+        """Login a user by checking email and password and returning an access and refresh token"""
+        user = models.User.objects.get(email=request.data['email'])
+
+        if not user:
+            return Response({'errorMessage': 'User with such email not found'}, status=status.HTTP_403_FORBIDDEN)
+
+        if not user.check_password(request.data['password']):
+            return Response({'errorMessage': 'Wrong password'}, status=status.HTTP_403_FORBIDDEN)
+
+        access_token = authentication.create_access_token(user.id)
+        refresh_token = authentication.create_refresh_token(user.id)
+
+        response = Response()
+        response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
+        response.data = {
+            'token': access_token,
+            'message': 'User logged in successfully'
+        }
+        response.status_code = status.HTTP_200_OK
+        return response
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

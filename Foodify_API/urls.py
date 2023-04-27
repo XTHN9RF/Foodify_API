@@ -10,6 +10,7 @@ router.register('products', views.ProductsViewSet)
 
 urlpatterns = [
     path('register', views.RegistrationApiView.as_view(), name='register'),
+    path('login', views.LoginApiView.as_view(), name='login'),
     path('products/<slug:pk>/', views.ProductsViewSet.as_view({'get': 'list'}), name='single-product'),
     path('categories/<slug:pk>/', views.CategoryViewSet.as_view({'get': 'list'}), name='products-of-specific-category'),
     path('', include(router.urls)),
