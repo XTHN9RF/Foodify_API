@@ -87,14 +87,7 @@ class CategoryApiView(APIView):
 
     def get(self, request):
         """Return a list of categories with search functionality provided"""
-        header = get_authorization_header(request).split()
-
-        if header and len(header) == 2:
-            token = header[1].decode('utf-8')
-        else:
-            return Response({'errorMessage': 'No token provided'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        is_token_valid = authentication.is_token_valid(token)
+        is_token_valid = authentication.is_token_valid(request)
 
         if is_token_valid:
             queryset = self.get_queryset()
@@ -119,14 +112,7 @@ class ProductsApiView(APIView):
 
     def get(self, request):
         """Gets a list of products with search functionality provided"""
-        header = get_authorization_header(request).split()
-
-        if header and len(header) == 2:
-            token = header[1].decode('utf-8')
-        else:
-            return Response({'errorMessage': 'No token provided'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        is_token_valid = authentication.is_token_valid(token)
+        is_token_valid = authentication.is_token_valid(request)
 
         if is_token_valid:
             queryset = self.get_queryset()
@@ -149,14 +135,7 @@ class SingleProductApiView(APIView):
 
     def get(self, request, pk=None):
         """Return a single product"""
-        header = get_authorization_header(request).split()
-
-        if header and len(header) == 2:
-            token = header[1].decode('utf-8')
-        else:
-            return Response({'errorMessage': 'No token provided'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        is_token_valid = authentication.is_token_valid(token)
+        is_token_valid = authentication.is_token_valid(request)
 
         if is_token_valid:
             queryset = self.get_queryset()
