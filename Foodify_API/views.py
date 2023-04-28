@@ -1,3 +1,4 @@
+from django.utils.text import slugify
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
 from rest_framework import status
@@ -85,7 +86,7 @@ class CategoryApiView(APIView):
     search_fields = ('name',)
 
     def get(self, request):
-        """Return a list of all categories or one category by name"""
+        """Return a list of categories with search functionality provided"""
         header = get_authorization_header(request).split()
 
         if header and len(header) == 2:
@@ -102,9 +103,41 @@ class CategoryApiView(APIView):
         return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
     def get_queryset(self):
-        """Return a list of all categories or one category by name"""
+        """Return a list of categories or searched categories"""
         queryset = models.Category.objects.all()
         category_name = self.request.query_params.get('search', None)
         if category_name:
             queryset = queryset.filter(slug__contains=category_name.lower())
+        return queryset
+
+
+class ProductsApiView(APIView):
+    """Handle getting and searching products"""
+    serializer_class = serializers.ProductSerializer
+    filter_backends = (SearchFilter,)
+    search_fields = ('name',)
+
+    def get(self, request):
+        """Gets a list of products with search functionality provided"""
+        header = get_authorization_header(request).split()
+
+        if header and len(header) == 2:
+            token = header[1].decode('utf-8')
+        else:
+            return Response({'errorMessage': 'No token provided'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        is_token_valid = authentication.is_token_valid(token)
+
+        if is_token_valid:
+            queryset = self.get_queryset()
+            serializer = serializers.ProductSerializer(queryset, many=True)
+            return Response(serializer.data)
+        return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    def get_queryset(self):
+        """Return a list of all products or searched products"""
+        queryset = models.Product.objects.all()
+        product_name = self.request.query_params.get('search', None)
+        if product_name:
+            queryset = queryset.filter(slug__contains=product_name.lower())
         return queryset
