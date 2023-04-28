@@ -11,5 +11,5 @@ urlpatterns = [
     path('refresh', views.RefreshApiView.as_view(), name='refresh'),
     path('categories/', views.CategoryApiView.as_view(), name='categories'),
     path('products/', views.ProductsApiView.as_view(), name='products'),
-
+    path('products/<slug:pk>', views.SingleProductApiView.as_view(), name='product'),
 ]

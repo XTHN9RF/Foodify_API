@@ -141,3 +141,34 @@ class ProductsApiView(APIView):
         if product_name:
             queryset = queryset.filter(slug__contains=product_name.lower())
         return queryset
+
+
+class SingleProductApiView(APIView):
+    """Handle getting a single product"""
+    serializer_class = serializers.ProductSerializer
+
+    def get(self, request, pk=None):
+        """Return a single product"""
+        header = get_authorization_header(request).split()
+
+        if header and len(header) == 2:
+            token = header[1].decode('utf-8')
+        else:
+            return Response({'errorMessage': 'No token provided'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        is_token_valid = authentication.is_token_valid(token)
+
+        if is_token_valid:
+            queryset = self.get_queryset()
+            serializer = serializers.ProductSerializer(queryset, many=True)
+            return Response(serializer.data)
+        return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    def get_queryset(self):
+        """Returns single product by pk"""
+        queryset = models.Product.objects.all()
+        product_name = self.kwargs.get('pk', None)
+        if product_name:
+            product_name = slugify(product_name)
+            queryset = queryset.filter(slug=product_name)
+        return queryset
