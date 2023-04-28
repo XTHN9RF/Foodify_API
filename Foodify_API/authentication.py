@@ -1,5 +1,6 @@
 import datetime
 import jwt
+from rest_framework.authentication import get_authorization_header
 from rest_framework.response import Response
 from Foodify_API import models
 
@@ -40,8 +41,15 @@ def decode_refresh_token(token):
         return Response({'errorMessage': 'Refresh token has expired, login again'}, status=401)
 
 
-def is_token_valid(token):
+def is_token_valid(request):
     try:
+        header = get_authorization_header(request).split()
+
+        if header and len(header) == 2:
+            token = header[1].decode('utf-8')
+        else:
+            return False
+
         payload = jwt.decode(token, 'access_secret', algorithms=['HS256'])
         user = models.User.objects.get(id=payload['user_id'])
         if not user:
