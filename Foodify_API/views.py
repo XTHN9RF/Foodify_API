@@ -19,10 +19,22 @@ class RegistrationApiView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(
-                {'message': 'User created successfully'},
-                status=status.HTTP_201_CREATED
-            )
+
+            user = models.User.objects.get(email=request.data['email'])
+
+            response = Response()
+
+            access_token = authentication.create_access_token(user.id)
+            refresh_token = authentication.create_refresh_token(user.id)
+
+            response.set_cookie(key="refresh_token", value=refresh_token, httponly=True)
+            response.data = {
+                'token': access_token,
+                'message': 'User created successfully'
+            }
+            response.status_code = status.HTTP_201_CREATED
+            return response
+
         return Response({"errorMessage": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
