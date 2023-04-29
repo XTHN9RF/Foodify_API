@@ -25,8 +25,14 @@ def create_refresh_token(id):
     )
 
 
-def decode_access_token(token):
+def decode_access_token(request):
     try:
+        header = get_authorization_header(request).split()
+
+        if header and len(header) == 2:
+            token = header[1].decode('utf-8')
+        else:
+            return Response({'errorMessage': 'Unauthenticated'}, status=401)
         payload = jwt.decode(token, 'access_secret', algorithms=['HS256'])
         return payload['user_id']
     except jwt.ExpiredSignatureError:
