@@ -61,8 +61,12 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class CartItemSerializer(serializers.ModelSerializer):
     """Serializer for the cart items object"""
+    product_name = serializers.CharField(source='product.name', read_only=True, write_only=False)
+    product_price = serializers.DecimalField(source='product.price', max_digits=5, decimal_places=2, read_only=True,
+                                             write_only=False)
+    product_image = serializers.CharField(source='product.image_url', read_only=True, write_only=False)
 
     class Meta:
         """Class that regulates behavior of the cart item serializer"""
         model = models.CartItem
-        fields = ('product', 'quantity')
+        fields = ('product_name', 'product_price', 'product_image', 'quantity')
