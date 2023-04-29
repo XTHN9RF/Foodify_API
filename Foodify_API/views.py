@@ -136,6 +136,11 @@ class ProductsApiView(APIView):
         """Return a list of all products or searched products"""
         queryset = models.Product.objects.all()
         product_name = self.request.query_params.get('search', None)
+        category_name = self.request.query_params.get('category', None)
+        if category_name:
+            category_name = slugify(category_name)
+            queryset = queryset.filter(category__slug=category_name)
+
         if product_name:
             queryset = queryset.filter(slug__contains=product_name.lower())
         return queryset
