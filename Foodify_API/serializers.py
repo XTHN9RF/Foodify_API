@@ -57,3 +57,12 @@ class ProductSerializer(serializers.ModelSerializer):
         """Class that regulates behavior of the product serializer"""
         model = models.Product
         fields = ('name', 'price', 'description', 'image_url')
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    """Serializer for the cart items object"""
+
+    class Meta:
+        """Class that regulates behavior of the cart item serializer"""
+        model = models.CartItem
+        fields = ('product', 'quantity')
