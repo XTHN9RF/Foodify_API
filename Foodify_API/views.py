@@ -151,7 +151,7 @@ class SingleProductApiView(APIView):
     serializer_class = serializers.ProductSerializer
 
     def get(self, request, pk=None):
-        """Return a single product"""
+        """Returns single product"""
         is_token_valid = authentication.is_token_valid(request)
 
         if is_token_valid:
@@ -168,3 +168,41 @@ class SingleProductApiView(APIView):
             product_name = slugify(product_name)
             queryset = queryset.filter(slug=product_name)
         return queryset
+
+
+class CartApiView(APIView):
+    """Handle getting and adding products to cart"""
+    serializer_class = serializers.CartItemSerializer
+
+    def get(self, request):
+        """"Returns list of products that are in cart of current user"""
+        is_token_valid = authentication.is_token_valid(request)
+
+        if is_token_valid:
+            user_id = authentication.decode_access_token(request)
+            queryset = models.CartItem.objects.filter(user__id=user_id)
+            serializer = serializers.CartItemSerializer(queryset, many=True)
+            return Response(serializer.data)
+
+        return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    def post(self, request):
+        """Adds a product to cart"""
+        is_token_valid = authentication.is_token_valid(request)
+
+        if is_token_valid:
+            user_id = authentication.decode_access_token(request)
+            user = models.User.objects.get(id=user_id)
+            product = models.Product.objects.get(slug=request.data['product_name'])
+            quantity = request.data['quantity']
+            cart_items = models.CartItem.objects.filter(user__id=user_id)
+
+            for item in cart_items:
+                if item.product == product:
+                    item.quantity += quantity
+                    item.save()
+                    return Response({'message': 'Product added to cart successfully'}, status=status.HTTP_201_CREATED)
+
+            new_cart_item = models.CartItem.objects.create(user=user, product=product, quantity=quantity)
+            new_cart_item.save()
+            return Response({'message': 'Product added to cart successfully'}, status=status.HTTP_201_CREATED)
