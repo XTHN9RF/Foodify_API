@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+import datetime
 from . import models
 
 
@@ -70,3 +70,16 @@ class CartItemSerializer(serializers.ModelSerializer):
         """Class that regulates behavior of the cart item serializer"""
         model = models.CartItem
         fields = ('product_name', 'product_price', 'product_image', 'quantity')
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    """Serializer for the orders object"""
+    date = serializers.DateTimeField(default=datetime.datetime.now(), read_only=True, write_only=False)
+
+    class Meta:
+        """Class that regulates behavior of the order serializer"""
+        model = models.Order
+        fields = ('receiver_phone_number', 'receiver_street', 'receiver_house_number', 'date')
+        extra_kwargs = {
+            'date': {'read_only': True, 'write_only': False}
+        }
