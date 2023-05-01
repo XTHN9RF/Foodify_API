@@ -145,3 +145,12 @@ class Order(models.Model):
 
     REQUIRED_FIELDS = ['user', 'cart_items', 'date', 'status', 'total_price', 'receiver_phone_number',
                        'receiver_street', 'receiver_house_number']
+
+
+class OrderItem(models.Model):
+    """Database model that represents item in the order"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    REQUIRED_FIELDS = ['product', 'quantity', 'order']
