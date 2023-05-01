@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils.text import slugify
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
@@ -216,4 +218,40 @@ class OrderApiView(APIView):
     serializer_class = serializers.OrderSerializer
 
     def post(self, request):
-        pass
+        is_token_valid = authentication.is_token_valid(request)
+
+        if is_token_valid:
+            serializer = self.serializer_class(data=request.data)
+            user_id = authentication.decode_access_token(request)
+            user = models.User.objects.get(id=user_id)
+            cart_items = models.CartItem.objects.filter(user__id=user_id)
+            total_price = 0
+            date = datetime.datetime.now()
+
+            for item in cart_items:
+                total_price += item.product.price * item.quantity
+
+            if serializer.is_valid():
+                receiver_street = serializer.validated_data['receiver_street']
+                receiver_house_number = serializer.validated_data['receiver_house_number']
+                receiver_phone_number = serializer.validated_data['receiver_phone_number']
+
+                order = models.Order.objects.create(user=user, date=date,
+                                                    receiver_street=receiver_street,
+                                                    receiver_house_number=receiver_house_number,
+                                                    receiver_phone_number=receiver_phone_number,
+                                                    total_price=total_price)
+
+                for item in cart_items:
+                    order_item = models.OrderItem.objects.create(order=order, product=item.product,
+                                                                 quantity=item.quantity)
+                    order_item.save()
+
+                order.save()
+                cart_items.delete()
+
+                return Response({'message': 'Order created successfully'}, status=status.HTTP_201_CREATED)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
