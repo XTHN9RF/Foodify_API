@@ -102,7 +102,7 @@ class CategoryApiView(APIView):
 
         if is_token_valid:
             queryset = self.get_queryset()
-            serializer = serializers.CategorySerializer(queryset, many=True)
+            serializer = self.serializer_class(queryset, many=True)
             return Response(serializer.data)
         return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -127,7 +127,7 @@ class ProductsApiView(APIView):
 
         if is_token_valid:
             queryset = self.get_queryset()
-            serializer = serializers.ProductSerializer(queryset, many=True)
+            serializer = self.serializer_class(queryset, many=True)
             return Response(serializer.data)
         return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -184,7 +184,7 @@ class CartApiView(APIView):
         if is_token_valid:
             user_id = authentication.decode_access_token(request)
             queryset = models.CartItem.objects.filter(user__id=user_id)
-            serializer = serializers.CartItemSerializer(queryset, many=True)
+            serializer = self.serializer_class(queryset, many=True)
             return Response(serializer.data)
 
         return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -213,6 +213,7 @@ class CartApiView(APIView):
 
 class OrderApiView(APIView):
     """"Handle creating orders"""
+    serializer_class = serializers.OrderSerializer
 
     def post(self, request):
         pass
