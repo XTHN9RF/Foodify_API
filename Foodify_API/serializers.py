@@ -74,12 +74,9 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     """Serializer for the orders object"""
-    date = serializers.DateTimeField(default=datetime.datetime.now(), read_only=True, write_only=False)
 
     class Meta:
         """Class that regulates behavior of the order serializer"""
         model = models.Order
-        fields = ('receiver_phone_number', 'receiver_street', 'receiver_house_number', 'date')
-        extra_kwargs = {
-            'date': {'read_only': True, 'write_only': False}
-        }
+        fields = ('receiver_phone_number', 'receiver_street', 'receiver_house_number')
+
