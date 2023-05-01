@@ -209,3 +209,10 @@ class CartApiView(APIView):
             new_cart_item = models.CartItem.objects.create(user=user, product=product, quantity=quantity)
             new_cart_item.save()
             return Response({'message': 'Product added to cart successfully'}, status=status.HTTP_201_CREATED)
+
+
+class OrderApiView(APIView):
+    """"Handle creating orders"""
+
+    def post(self, request):
+        pass

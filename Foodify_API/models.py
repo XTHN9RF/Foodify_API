@@ -141,7 +141,7 @@ class Order(models.Model):
     receiver_street = models.CharField(max_length=50, blank=True, null=True)
     receiver_house_number = models.CharField(max_length=10, blank=True, null=True)
     receiver_phone_number = models.CharField(max_length=15)
-    status = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, default='Processing')
 
     REQUIRED_FIELDS = ['user', 'address', 'cart_items', 'date', 'status', 'total_price', 'phone_number',
                        'receiver_street', 'receiver_house_number']
