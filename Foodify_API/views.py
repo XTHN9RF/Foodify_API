@@ -204,13 +204,25 @@ class CartApiView(APIView):
 
             for item in cart_items:
                 if item.product == product:
-                    item.quantity += quantity
+                    item.quantity = quantity
                     item.save()
                     return Response({'message': 'Product added to cart successfully'}, status=status.HTTP_201_CREATED)
 
             new_cart_item = models.CartItem.objects.create(user=user, product=product, quantity=quantity)
             new_cart_item.save()
             return Response({'message': 'Product added to cart successfully'}, status=status.HTTP_201_CREATED)
+
+    def delete(self, request):
+        """Deletes a product from cart"""
+        is_token_valid = authentication.is_token_valid(request)
+
+        if is_token_valid:
+            user_id = authentication.decode_access_token(request)
+            product = models.Product.objects.get(slug=request.data['product_name'])
+            cart_items = models.CartItem.objects.filter(user__id=user_id, product=product)
+            cart_items.delete()
+            return Response({'message': 'Product deleted from cart successfully'}, status=status.HTTP_200_OK)
+        return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class OrderApiView(APIView):
