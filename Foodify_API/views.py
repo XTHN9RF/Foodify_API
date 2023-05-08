@@ -227,7 +227,7 @@ class CartApiView(APIView):
 
 class OrderApiView(APIView):
     """"Handle creating orders"""
-    serializer_class = serializers.OrderSerializer
+    serializer_class = serializers.CreateOrderSerializer
 
     def post(self, request):
         is_token_valid = authentication.is_token_valid(request)
@@ -266,4 +266,22 @@ class OrderApiView(APIView):
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class OrderHistoryApiView(APIView):
+    """Handle getting order history"""
+    serializer_class = serializers.OrderItemSerializer
+
+    def get(self, request):
+        is_token_valid = authentication.is_token_valid(request)
+
+        if is_token_valid:
+            user_id = authentication.decode_access_token(request)
+            orders = models.Order.objects.filter(user__id=user_id)
+            order_items = models.OrderItem.objects.filter(order__in=orders)
+            order_data = serializers.GetOrderSerializer(orders, many=True).data
+            order_item_data = self.serializer_class(order_items, many=True).data
+            data = {'order': order_data, 'order_items': order_item_data}
+            return Response(data)
         return Response({'errorMessage': 'Unauthenticated'}, status=status.HTTP_401_UNAUTHORIZED)

@@ -14,4 +14,5 @@ urlpatterns = [
     path('products/<slug:pk>', views.SingleProductApiView.as_view(), name='product'),
     path('cart/', views.CartApiView.as_view(), name='cart'),
     path('order/', views.OrderApiView.as_view(), name='order'),
+    path('order-history/', views.OrderHistoryApiView.as_view(), name='order-history'),
 ]
