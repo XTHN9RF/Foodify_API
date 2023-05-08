@@ -72,7 +72,7 @@ class CartItemSerializer(serializers.ModelSerializer):
         fields = ('product_name', 'product_price', 'product_image', 'quantity')
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class CreateOrderSerializer(serializers.ModelSerializer):
     """Serializer for the orders object"""
 
     class Meta:
@@ -80,3 +80,30 @@ class OrderSerializer(serializers.ModelSerializer):
         model = models.Order
         fields = ('receiver_phone_number', 'receiver_street', 'receiver_house_number')
 
+
+class GetOrderSerializer(serializers.ModelSerializer):
+    """Serializer for the orders object"""
+    receiver_name = serializers.CharField(source='user.name', read_only=True, write_only=False)
+    receiver_last_name = serializers.CharField(source='user.last_name', read_only=True, write_only=False)
+    receiver_email = serializers.CharField(source='user.email', read_only=True, write_only=False)
+    receiver_phone_number = serializers.CharField(read_only=True, write_only=False)
+    date = serializers.DateTimeField(read_only=True, write_only=False, format="%d.%m.%Y %H:%M")
+    status = serializers.CharField(read_only=True, write_only=False)
+
+    class Meta:
+        """Class that regulates behavior of the order serializer"""
+        model = models.Order
+        fields = ('receiver_name', 'receiver_last_name', 'receiver_email', 'receiver_phone_number', 'date',
+                  'status')
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    """Serializer for the order history object"""
+    product_name = serializers.CharField(source='product', read_only=True, write_only=False)
+    product_image = serializers.CharField(source='product.image_url', read_only=True, write_only=False)
+    product_price = serializers.DecimalField(source='product.price', max_digits=5, decimal_places=2, read_only=True, )
+
+    class Meta:
+        """Class that regulates behavior of the order history serializer"""
+        model = models.OrderItem
+        fields = ('product_name', 'product_image', 'product_price', 'quantity')
